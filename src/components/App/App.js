@@ -21,6 +21,10 @@ class App extends React.Component {
     this.search = this.search.bind(this);
   }
 
+  componentDidMount() {
+    Spotify.getAccessToken();
+  }
+
   addTrack(track) {
     if (
       this.state.playlistTracks.some(plistTrack => track.id === plistTrack.id)
@@ -44,12 +48,16 @@ class App extends React.Component {
   }
 
   savePlaylist() {
-    console.log('save');
+    console.log(this.state.playlistName);
+    Spotify.savePlaylist(
+      this.state.playlistName,
+      this.state.playlistTracks.map(track => track.uri)
+    );
+    this.setState({ playlistName: '', playlistTracks: [] });
   }
 
   async search(term) {
     try {
-      Spotify.getAccessToken();
       const results = await Spotify.search(term);
       console.log(results);
       this.setState({ searchResults: results });

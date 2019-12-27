@@ -69,6 +69,56 @@ class Spotify extends React.Component {
     }
   }
 
+  //continue 25/12/2019
+  static async savePlaylist(name, tracks) {
+    if (!name || !tracks) {
+      return;
+    }
+    const accessToken = Spotify.getAccessToken();
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    let userId = '';
+    console.log(accessToken);
+
+    try {
+      // Get the users spotify ID
+      const response = await fetch('https://api.spotify.com/v1/me', {
+        headers
+      }).then(response => response.json());
+      userId = response.id;
+
+      // Set the payload to send to spotify api to create a playlist
+      const payload = {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ name })
+      };
+
+      // Make the request to create a playlist and save the playlist id
+      const playlist = await fetch(
+        `https://api.spotify.com/v1/users/${userId}/playlists`,
+        payload
+      ).then(response => response.json());
+
+      const playlistId = playlist.id;
+
+      // Payload to add songs to playlist
+      const playload = {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ uris: tracks })
+      };
+      // Add songs to the playlist
+      const savedPlaylist = await fetch(
+        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        playload
+      ).then(response => response.json());
+      console.log(savedPlaylist);
+      console.log('Playlist saved');
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
   // render() {
   //   return <button onClick={this.search}>Click For HREF</button>;
   // }
