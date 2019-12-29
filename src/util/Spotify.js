@@ -3,7 +3,7 @@ import React from 'react';
 let accessToken = '';
 let expiresIn = '';
 const clientId = 'bd433194c7cd482f89aa039b0ff09daf';
-const redirectUrl = 'http://localhost:3000/';
+const redirectUrl = 'http://eugeneSpotifyApp.surge.sh';
 
 class Spotify extends React.Component {
   constructor(props) {
