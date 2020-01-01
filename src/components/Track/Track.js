@@ -35,7 +35,7 @@ class Track extends React.Component {
   };
 
   render() {
-    // console.log(this.props.isRemoval);
+    console.log(this.props.isRemoval);
     return (
       <div className='Track'>
         <div className='Track-information'>
@@ -45,7 +45,7 @@ class Track extends React.Component {
             {this.props.track.artist} | {this.props.track.album}{' '}
           </p>
         </div>
-        {this.renderAction()}
+        {this.state.isRemoval !== undefined ? this.renderAction() : null}
       </div>
     );
   }

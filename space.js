@@ -1,18 +1,16 @@
-import React from 'react';
-import Track from '../Track/Track';
-import './TrackList.css';
+// rename playlists
 
-class TrackList extends React.Component {
-  render() {
-    console.log(this.props.searchResults);
-    return (
-      <div className='TrackList'>
-        {this.props.searchResults.map(data => (
-          <Track />
-        ))}
-      </div>
-    );
-  }
-}
+playlists.items.forEach(async (list, index) => {
+  const payload = {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({ name: `test${index}` })
+  };
 
-export default TrackList;
+  const editList = await fetch(
+    `https://api.spotify.com/v1/playlists/${list.id}`,
+    payload
+  ).then(response => console.log(response));
+
+  console.log(editList);
+});

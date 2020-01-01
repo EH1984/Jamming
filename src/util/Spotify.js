@@ -3,7 +3,7 @@ import React from 'react';
 let accessToken = '';
 let expiresIn = '';
 const clientId = 'bd433194c7cd482f89aa039b0ff09daf';
-const redirectUrl = 'http://eugeneSpotifyApp.surge.sh';
+const redirectUrl = 'http://localhost:3000/';
 
 class Spotify extends React.Component {
   constructor(props) {
@@ -114,6 +114,53 @@ class Spotify extends React.Component {
       ).then(response => response.json());
       console.log(savedPlaylist);
       console.log('Playlist saved');
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+  static async getPlaylists() {
+    const accessToken = Spotify.getAccessToken();
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    let userId = '';
+
+    try {
+      // Get the users spotify ID
+      const response = await fetch('https://api.spotify.com/v1/me', {
+        headers
+      }).then(response => response.json());
+      userId = response.id;
+
+      // Retrieve the users playlists
+      const playlists = await fetch(
+        `https://api.spotify.com/v1/users/${userId}/playlists`,
+        { headers }
+      ).then(response => response.json());
+
+      return playlists;
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+  static async getPlaylist(id) {
+    const accessToken = Spotify.getAccessToken();
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    try {
+      const playlist = await fetch(
+        `https://api.spotify.com/v1/playlists/${id}`,
+        { headers }
+      ).then(response => response.json());
+
+      return playlist.tracks.items.map(item => {
+        return {
+          id: item.track.id,
+          name: item.track.name,
+          artist: item.track.artists[0].name,
+          album: item.track.album.name,
+          uri: item.track.uri
+        };
+      });
     } catch (err) {
       console.log(err.message);
     }

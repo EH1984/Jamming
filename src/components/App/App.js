@@ -3,6 +3,7 @@ import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
 import PlayList from '../PlayList/PlayList';
 import Spotify from '../../util/Spotify';
+import ViewPlaylist from '../ViewPlaylist/ViewPlaylist';
 import './App.css';
 
 class App extends React.Component {
@@ -11,7 +12,9 @@ class App extends React.Component {
     this.state = {
       searchResults: [],
       playlistName: '',
-      playlistTracks: []
+      getPlaylistName: '',
+      playlistTracks: [],
+      storedPlaylistTracks: []
     };
 
     this.addTrack = this.addTrack.bind(this);
@@ -19,6 +22,8 @@ class App extends React.Component {
     this.updatePlaylistName = this.updatePlaylistName.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.search = this.search.bind(this);
+    this.updateGetPlaylistName = this.updateGetPlaylistName.bind(this);
+    this.getPlaylist = this.getPlaylist.bind(this);
   }
 
   componentDidMount() {
@@ -47,6 +52,10 @@ class App extends React.Component {
     this.setState({ playlistName: name });
   }
 
+  updateGetPlaylistName(name) {
+    this.setState({ getPlaylistName: name });
+  }
+
   savePlaylist() {
     console.log(this.state.playlistName);
     Spotify.savePlaylist(
@@ -63,6 +72,28 @@ class App extends React.Component {
       this.setState({ searchResults: results });
     } catch (err) {
       console.log(err.message);
+    }
+  }
+
+  async getPlaylist() {
+    // Get a list of playlists
+    const playlists = await Spotify.getPlaylists();
+
+    // Get the playlist that the user typed in
+    const playlist = playlists.items.filter(
+      list => list.name === this.state.getPlaylistName
+    );
+
+    // Check if playlist exists
+    if (playlist.length > 0) {
+      // Get the playlist id
+      const playlistId = playlist[0].id;
+      // Get element from playlist to populate the component
+      const newPlaylist = await Spotify.getPlaylist(playlistId);
+      // Set the state for the stored playlist
+      this.setState({ storedPlaylistTracks: newPlaylist });
+    } else {
+      console.log('Doesnt exist');
     }
   }
 
@@ -86,6 +117,11 @@ class App extends React.Component {
               onRemove={this.removeTrack}
               onNameChange={this.updatePlaylistName}
               onSave={this.savePlaylist}
+            />
+            <ViewPlaylist
+              storedPlaylist={this.state.storedPlaylistTracks}
+              getPlaylist={this.getPlaylist}
+              getPlaylistName={this.updateGetPlaylistName}
             />
           </div>
         </div>
